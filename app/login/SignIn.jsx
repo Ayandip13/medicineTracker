@@ -4,6 +4,7 @@ import Colors from "../../Constants/Colors";
 import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
+import { StatusBar } from "expo-status-bar";
 
 const SignIn = () => {
   const [secureText, setSecureText] = useState(true);
@@ -11,7 +12,8 @@ const SignIn = () => {
   const router = useRouter();
 
   return (
-    <View style={{ padding: 25 }}>
+    <View style={{ padding: 25, backgroundColor: "#E8F9FF", flex: 1 }}>
+      <StatusBar backgroundColor="#E8F9FF" />
       <Text style={{ fontSize: 30, fontWeight: "bold", marginTop: 18 }}>
         Let's Sign You In
       </Text>
@@ -75,6 +77,7 @@ const SignIn = () => {
         onPress={() => setSecureText((prev) => !prev)}
       />
       <TouchableOpacity
+        activeOpacity={0.8}
         style={{
           padding: 20,
           backgroundColor: Colors.PRIMARY,
@@ -87,7 +90,7 @@ const SignIn = () => {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => router.push("login/signUp")}
+        onPress={() => router.push("login/SignUp")}
         style={{
           padding: 20,
           backgroundColor: "white",

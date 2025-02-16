@@ -2,12 +2,14 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import Colors from "../../Constants/Colors";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 const LoginScreen = () => {
   const router = useRouter();
 
   return (
-    <View>
+    <View style={{ backgroundColor: "#E8F9FF", flex: 1 }}>
+      <StatusBar backgroundColor="#E8F9FF"/>
       <View style={{ display: "flex", alignItems: "center", marginTop: 30 }}>
         <Image
           source={require("../../assets/images/adaptive-icon.png")}
@@ -38,7 +40,7 @@ const LoginScreen = () => {
           Track your meds, take control over your health
         </Text>
         <TouchableOpacity
-          onPress={() => router.push("login/signIn")}
+          onPress={() => router.push("login/SignIn")}
           activeOpacity={0.6}
           style={{
             padding: 15,
