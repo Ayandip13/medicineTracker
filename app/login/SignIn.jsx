@@ -1,15 +1,46 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ToastAndroid,
+} from "react-native";
 import React from "react";
 import Colors from "../../Constants/Colors";
 import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
+import { auth } from "../../configs/FirebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const SignIn = () => {
   const [secureText, setSecureText] = useState(true);
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
 
   const router = useRouter();
+
+  const OnSignInClick = () => {
+    if ((!email, !password)) {
+      ToastAndroid.show("Please fill all details", ToastAndroid.BOTTOM);
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        router.push("(tabs)"); //if user is there, means if sucessfully logged in then the user. then we'll go to the nest screen
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        if (errorCode == "auth/invalid-credential") {
+          ToastAndroid.show("Invalid email or password", ToastAndroid.BOTTOM);
+        }
+      });
+  };
 
   return (
     <View style={{ padding: 25, backgroundColor: "#E8F9FF", flex: 1 }}>
@@ -51,6 +82,7 @@ const SignIn = () => {
             marginTop: 5,
             backgroundColor: "white",
           }}
+          onChangeText={(e) => setEmail(e)}
         />
       </View>
       <View style={{ marginTop: 25 }}>
@@ -67,6 +99,7 @@ const SignIn = () => {
             backgroundColor: "white",
           }}
           secureTextEntry={secureText}
+          onChangeText={(e) => setPassword(e)}
         />
       </View>
       <FontAwesome
@@ -84,6 +117,7 @@ const SignIn = () => {
           borderRadius: 15,
           marginTop: 35,
         }}
+        onPress={()=>OnSignInClick()}
       >
         <Text style={{ fontSize: 18, color: "white", textAlign: "center" }}>
           Login
