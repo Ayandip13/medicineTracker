@@ -12,6 +12,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { auth } from "./../../configs/FirebaseConfig";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { setLocalStorage } from "../../service/Storage";
 
 const SignUp = () => {
   const [textEntry, setTextEntry] = useState(true);
@@ -32,7 +33,10 @@ const SignUp = () => {
       .then(async (userCredential) => {
         // Signed up
         const user = userCredential.user;
+
         await updateProfile(user, { displayName: userName });
+        
+        await setLocalStorage('userDetail', user)
         router.push("(tabs)");
       })
       .catch((error) => {

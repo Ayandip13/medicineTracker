@@ -4,34 +4,23 @@ import { Tabs, useRouter } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../configs/FirebaseConfig";
+import { getLocalStorage } from "../../service/Storage";
 
 const TabLayout = () => {
   //if user login or not
 
   const router = useRouter();
-  const [authenticated, setAuthticated] = useState(null)
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      console.log(uid); 
-      setAuthticated(true)
-    } else {
-      router?.push("/login");
-      setAuthticated(false)
+  const getUserDetails = async () => {
+    const userInfo = await getLocalStorage("userDetail");
+    if (!userInfo) {
+      router.replace("/login");
     }
-  });
+  };
 
-
-  useEffect(()=>{
-    if (authenticated == false) {
-      router.push('/login')
-    }
-  }, [authenticated])
-
-
-
-
+  useEffect(() => {
+    getUserDetails();
+  }, []);
 
   return (
     <Tabs screenOptions={{ headerShown: false }}>

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { auth } from "../../configs/FirebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { setLocalStorage } from "../../service/Storage";
 
 const SignIn = () => {
   const [secureText, setSecureText] = useState(true);
@@ -28,8 +29,9 @@ const SignIn = () => {
     }
 
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         const user = userCredential.user;
+        await setLocalStorage("userDetail", user);
         console.log(user);
         router.push("(tabs)"); //if user is there, means if sucessfully logged in then the user. then we'll go to the nest screen
       })
@@ -117,7 +119,7 @@ const SignIn = () => {
           borderRadius: 15,
           marginTop: 35,
         }}
-        onPress={()=>OnSignInClick()}
+        onPress={() => OnSignInClick()}
       >
         <Text style={{ fontSize: 18, color: "white", textAlign: "center" }}>
           Login

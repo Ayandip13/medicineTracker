@@ -3,9 +3,9 @@ import { Stack } from "expo-router";
 
 const RootLayout = () => {
   return (
-    <Stack screenOptions={{headerShown:false}}>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="login"/>
+      <Stack.Screen name="login" />
     </Stack>
   );
 };
