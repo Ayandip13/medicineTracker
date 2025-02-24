@@ -123,16 +123,42 @@ const AddMedicationForm = () => {
         />
       </View>
 
-      <View>
-        <Ionicons name="time-outline" size={25} color={Colors.PRIMARY} />
+
+
+      <View
+        style={{
+          flexDirection: "row",
+          display: "flex",
+          alignItems: "center",
+          padding: 9,
+          borderWidth: 0.2,
+          borderRadius: 8,
+          marginTop: 10,
+          paddingLeft: 14,
+        }}
+      >
+        <Ionicons
+          name="time-outline"
+          size={25}
+          style={{
+            color: Colors.PRIMARY,
+            borderRightWidth: 0.8,
+            paddingRight: 12,
+          }}
+        />
+
         <Picker
-          style={{ height: 50, width: 200 }}
-        >
-          {
-            WhenToTake.map((item,index)=>(
-              <Picker.Item label={item} value={item} key={index}/>
-            ))
+          onValueChange={formData?.when}
+          selectedValue={(itemValue, itemIndex) =>
+            onHandleInputChange("when", itemValue)
           }
+          style={{
+            width: "90%",
+          }}
+        >
+          {WhenToTake.map((item, index) => (
+            <Picker.Item label={item} value={item} key={index} />
+          ))}
         </Picker>
       </View>
     </View>
