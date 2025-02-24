@@ -9,11 +9,16 @@ const LoginScreen = () => {
 
   return (
     <View style={{ backgroundColor: "#E8F9FF", flex: 1 }}>
-      <StatusBar backgroundColor="#E8F9FF"/>
+      <StatusBar backgroundColor="#E8F9FF" />
       <View style={{ display: "flex", alignItems: "center", marginTop: 30 }}>
         <Image
-          source={require("../../assets/images/adaptive-icon.png")}
-          style={{ width: 210, height: 450, borderRadius: 20 }}
+          source={require("../../assets/images/edge_cropped_image.png")}
+          style={{
+            width: 210,
+            height: 450,
+            borderRadius: 800,
+            resizeMode: "contain",
+          }}
         />
       </View>
       <View
@@ -55,7 +60,7 @@ const LoginScreen = () => {
             Continue
           </Text>
         </TouchableOpacity>
-        <Text style={{ color: "white", marginTop: 10 }}>
+        <Text style={{ color: "white", marginTop: 15 }}>
           Note: By Clicking Continue button, you will agree to our terms and
           conditions
         </Text>
