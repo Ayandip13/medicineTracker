@@ -4,57 +4,40 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
 import { TypeList, WhenToTake } from "../Constants/Options";
 import { Picker } from "@react-native-picker/picker";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { fomatDateForText, formDate } from "../service/ConvertDateTime";
 
 const AddMedicationForm = () => {
   const [formData, setFormData] = useState("");
+  const [showStartDate, setShowStartDate] = useState(false);
+  const [showEndDate, setShowEndDate] = useState(false);
 
   const onHandleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value, //[field] is Computed Property Name syntax in JavaScript. It allows dynamically setting object keys based on the value of field.
+      [field]: value,
     }));
   };
-  //This function ensures that the form dynamically updates and holds user input without overwriting previous values.
 
   console.log(formData);
 
   return (
-    <View style={{ padding: 25 }}>
-      <Text style={{ fontSize: 26, fontWeight: "bold" }}>
-        Add New Medication
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Add New Medication</Text>
 
-      <View
-        style={{
-          flexDirection: "row",
-          display: "flex",
-          alignItems: "center",
-          padding: 9,
-          borderWidth: 0.2,
-          borderRadius: 8,
-          marginTop: 10,
-          paddingLeft: 14,
-        }}
-      >
-        <Ionicons
-          name="medkit-outline"
-          size={25}
-          style={{
-            color: Colors.PRIMARY,
-            borderRightWidth: 0.8,
-            paddingRight: 12,
-          }}
-        />
+      <View style={styles.inputContainer}>
+        <Ionicons name="medkit-outline" size={25} style={styles.icon} />
         <TextInput
           onChangeText={(value) => onHandleInputChange("name", value)}
           placeholder="Medicine Name"
-          style={{ flex: 1, marginLeft: 14, fontSize: 16 }}
+          style={styles.textInput}
         />
       </View>
 
@@ -62,19 +45,11 @@ const AddMedicationForm = () => {
         showsHorizontalScrollIndicator={false}
         horizontal
         data={TypeList}
-        renderItem={({ item, index }) => (
+        renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => onHandleInputChange("type", item)}
             style={[
-              {
-                margin: 10,
-                borderWidth: 0.4,
-                padding: 10,
-                backgroundColor: "white",
-                borderColor: Colors.DARK_GRAY,
-                borderRadius: 5,
-                paddingHorizontal: 15,
-              },
+              styles.typeButton,
               {
                 backgroundColor:
                   item.name == formData?.type?.name ? Colors.PRIMARY : "white",
@@ -82,12 +57,10 @@ const AddMedicationForm = () => {
             ]}
           >
             <Text
-              style={[
-                { fontSize: 16 },
-                {
-                  color: item.name == formData?.type?.name ? "white" : "black",
-                },
-              ]}
+              style={{
+                fontSize: 16,
+                color: item.name == formData?.type?.name ? "white" : "black",
+              }}
             >
               {item?.name}
             </Text>
@@ -95,74 +68,141 @@ const AddMedicationForm = () => {
         )}
       />
 
-      <View
-        style={{
-          flexDirection: "row",
-          display: "flex",
-          alignItems: "center",
-          padding: 9,
-          borderWidth: 0.2,
-          borderRadius: 8,
-          marginTop: -1,
-          paddingLeft: 14,
-        }}
-      >
-        <Ionicons
-          name="eyedrop-outline"
-          size={25}
-          style={{
-            color: Colors.PRIMARY,
-            borderRightWidth: 0.8,
-            paddingRight: 12,
-          }}
-        />
+      <View style={styles.inputContainer}>
+        <Ionicons name="eyedrop-outline" size={25} style={styles.icon} />
         <TextInput
-          onChangeText={(value) => onHandleInputChange("name", value)}
+          onChangeText={(value) => onHandleInputChange("dose", value)}
           placeholder="Dose Ex. 2, 5ml"
-          style={{ flex: 1, marginLeft: 14, fontSize: 16 }}
+          style={styles.textInput}
         />
       </View>
 
-
-
-      <View
-        style={{
-          flexDirection: "row",
-          display: "flex",
-          alignItems: "center",
-          padding: 9,
-          borderWidth: 0.2,
-          borderRadius: 8,
-          marginTop: 10,
-          paddingLeft: 14,
-        }}
-      >
-        <Ionicons
-          name="time-outline"
-          size={25}
-          style={{
-            color: Colors.PRIMARY,
-            borderRightWidth: 0.8,
-            paddingRight: 12,
-          }}
-        />
-
+      <View style={styles.inputContainer}>
+        <Ionicons name="time-outline" size={25} style={styles.icon} />
         <Picker
-          onValueChange={formData?.when}
-          selectedValue={(itemValue, itemIndex) =>
-            onHandleInputChange("when", itemValue)
-          }
-          style={{
-            width: "90%",
-          }}
+          selectedValue={formData?.when}
+          onValueChange={(itemValue) => onHandleInputChange("when", itemValue)}
+          style={styles.picker}
         >
           {WhenToTake.map((item, index) => (
             <Picker.Item label={item} value={item} key={index} />
           ))}
         </Picker>
       </View>
+
+      <View style={styles.rowContainer}>
+        <TouchableOpacity
+          onPress={() => setShowStartDate(true)}
+          style={styles.dateContainer}
+        >
+          <Ionicons
+            name="calendar-number-outline"
+            size={25}
+            style={styles.icon}
+          />
+          <Text style={styles.dateText}>
+            {fomatDateForText(formData?.startDate) ?? "Start Date"}
+          </Text>
+        </TouchableOpacity>
+        {showStartDate && (
+          <RNDateTimePicker
+            minimumDate={new Date()}
+            onChange={(e) => {
+              onHandleInputChange(
+                "startDate",
+                formDate(e.nativeEvent.timestamp)
+              );
+              setShowStartDate(false);
+            }}
+            value={new Date(formData?.startDate) ?? new Date()}
+          />
+        )}
+
+        <TouchableOpacity
+          onPress={() => setShowEndDate(true)}
+          style={styles.dateContainer}
+        >
+          <Ionicons
+            name="calendar-number-outline"
+            size={25}
+            style={styles.icon}
+          />
+          <Text style={styles.dateText}>
+            {fomatDateForText(formData?.endDate) ?? "End Date"}
+          </Text>
+        </TouchableOpacity>
+        {showEndDate && (
+          <RNDateTimePicker
+            minimumDate={new Date()}
+            onChange={(e) => {
+              onHandleInputChange("endDate", formDate(e.nativeEvent.timestamp));
+              setShowEndDate(false);
+            }}
+            value={new Date(formDate?.endDate) ?? new Date()}
+          />
+        )}
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 25,
+  },
+  header: {
+    fontSize: 26,
+    fontWeight: "bold",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 9,
+    borderWidth: 0.2,
+    borderRadius: 8,
+    marginTop: 10,
+    paddingLeft: 14,
+  },
+  icon: {
+    color: Colors.PRIMARY,
+    borderRightWidth: 0.8,
+    paddingRight: 12,
+  },
+  textInput: {
+    flex: 1,
+    marginLeft: 14,
+    fontSize: 16,
+  },
+  typeButton: {
+    margin: 10,
+    borderWidth: 0.4,
+    padding: 10,
+    backgroundColor: "white",
+    borderColor: Colors.DARK_GRAY,
+    borderRadius: 5,
+    paddingHorizontal: 15,
+  },
+  picker: {
+    width: "90%",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 9,
+    borderWidth: 0.2,
+    borderRadius: 8,
+    marginTop: 10,
+    flex: 1,
+    paddingLeft: 14,
+  },
+  dateText: {
+    fontSize: 16,
+    padding: 10,
+  },
+});
 
 export default AddMedicationForm;
