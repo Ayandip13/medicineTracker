@@ -5,6 +5,8 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,12 +14,22 @@ import Colors from "../Constants/Colors";
 import { TypeList, WhenToTake } from "../Constants/Options";
 import { Picker } from "@react-native-picker/picker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { fomatDateForText, formDate } from "../service/ConvertDateTime";
+import {
+  fomatDateForText,
+  formatTime,
+  formDate,
+} from "../service/ConvertDateTime";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../configs/FirebaseConfig";
+import { getLocalStorage } from "./../service/Storage";
+
+
 
 const AddMedicationForm = () => {
   const [formData, setFormData] = useState("");
   const [showStartDate, setShowStartDate] = useState(false);
   const [showEndDate, setShowEndDate] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const onHandleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -27,6 +39,31 @@ const AddMedicationForm = () => {
   };
 
   console.log(formData);
+
+  const saveMedication = async () => {
+    const docId = Date.now().toString()
+    const user = await getLocalStorage('userDetail')
+
+    if (!(formData?.name|| formData?.type||formData?.dose||formData?.startDate||formData?.endDate||formData?.reminder)) {
+      Alert.alert('Enter All Fields')
+      return; 
+    }
+    try {
+      await setDoc(doc(db, 'medication', docId),{
+        ...formData,
+        userEmail:user?.email,
+        docId:docId
+      })
+      console.log('Data saved');
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
+
 
   return (
     <View style={styles.container}>
@@ -138,10 +175,40 @@ const AddMedicationForm = () => {
               onHandleInputChange("endDate", formDate(e.nativeEvent.timestamp));
               setShowEndDate(false);
             }}
-            value={new Date(formDate?.endDate) ?? new Date()}
+            value={new Date(formData?.endDate) ?? new Date()}
           />
         )}
       </View>
+
+      <View style={styles.rowContainer}>
+        <TouchableOpacity
+          onPress={() => setShowTimePicker(true)}
+          style={styles.dateContainer}
+        >
+          <Ionicons name="time-outline" size={25} style={styles.icon} />
+          <Text style={styles.dateText}>
+            {formData?.reminder ?? "Select Reminder Time"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {showTimePicker && (
+        <RNDateTimePicker
+          mode="time"
+          onChange={(e) => {
+            onHandleInputChange(
+              "reminder",
+              formatTime(e.nativeEvent.timestamp)
+            );
+            setShowTimePicker(false);
+          }}
+          value={new Date(formData?.reminder) ?? new Date()}
+        />
+      )}
+
+      <TouchableOpacity onPress={saveMedication} style={styles.button} activeOpacity={0.7}>
+        <Text style={styles.buttonText}>Add New Medication</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -202,6 +269,20 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 16,
     padding: 10,
+  },
+  button: {
+    padding: 15,
+    backgroundColor: Colors.PRIMARY,
+    borderRadius: 10,
+    width: "100%",
+    marginTop: 20,
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "500",
   },
 });
 
