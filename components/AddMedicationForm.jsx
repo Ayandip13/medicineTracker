@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,18 +19,21 @@ import {
   fomatDateForText,
   formatTime,
   formDate,
+  getRangeDate,
 } from "../service/ConvertDateTime";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../configs/FirebaseConfig";
 import { getLocalStorage } from "./../service/Storage";
-
-
+import { useRouter } from "expo-router";
 
 const AddMedicationForm = () => {
   const [formData, setFormData] = useState("");
   const [showStartDate, setShowStartDate] = useState(false);
   const [showEndDate, setShowEndDate] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const onHandleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -41,29 +45,45 @@ const AddMedicationForm = () => {
   console.log(formData);
 
   const saveMedication = async () => {
-    const docId = Date.now().toString()
-    const user = await getLocalStorage('userDetail')
+    const docId = Date.now().toString();
+    const user = await getLocalStorage("userDetail");
 
-    if (!(formData?.name|| formData?.type||formData?.dose||formData?.startDate||formData?.endDate||formData?.reminder)) {
-      Alert.alert('Enter All Fields')
-      return; 
+    if (
+      !(
+        formData?.name ||
+        formData?.type ||
+        formData?.dose ||
+        formData?.startDate ||
+        formData?.endDate ||
+        formData?.reminder
+      )
+    ) {
+      Alert.alert("Enter All Fields");
+      return;
     }
+    setLoading(true);
+    const dates = getRangeDate(formData?.startDate, formData?.endDate);
+    console.log(dates);
     try {
-      await setDoc(doc(db, 'medication', docId),{
+      await setDoc(doc(db, "medication", docId), {
         ...formData,
-        userEmail:user?.email,
-        docId:docId
-      })
-      console.log('Data saved');
-      
+        userEmail: user?.email,
+        docId: docId,
+        dates: dates
+      });
+      console.log("Data saved");
+      setLoading(false);
+      Alert.alert("Greet", "New Medications are added succesfully!", [
+        {
+          text: "OK!",
+          onPress: () => router.push("(tabs)"),
+        },
+      ]);
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
-  }
-
-
-
-
+  };
 
   return (
     <View style={styles.container}>
@@ -206,8 +226,16 @@ const AddMedicationForm = () => {
         />
       )}
 
-      <TouchableOpacity onPress={saveMedication} style={styles.button} activeOpacity={0.7}>
-        <Text style={styles.buttonText}>Add New Medication</Text>
+      <TouchableOpacity
+        onPress={saveMedication}
+        style={styles.button}
+        activeOpacity={0.7}
+      >
+        {loading ? (
+          <ActivityIndicator size={"large"} color={Colors.PRIMARY} />
+        ) : (
+          <Text style={styles.buttonText}>Add New Medication</Text>
+        )}
       </TouchableOpacity>
     </View>
   );

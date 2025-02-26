@@ -34,12 +34,12 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="AddNew"
+        name="History"
         options={{
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="plus-circle" size={24} color={color} />
+            <FontAwesome name="history" size={24} color={color} />
           ),
-          tabBarLabel: "Add Medicine",
+          tabBarLabel: "History",
         }}
       />
       <Tabs.Screen
