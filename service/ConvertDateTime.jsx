@@ -40,3 +40,15 @@ export const getRangeDate = (startDate, endDate) => {
   // Return the array containing all dates in the range
   return dates;
 };
+
+export const getDateRangeToDisplay = () => {
+  const dateList = [];
+  for (let i = 0; i <= 7; i++) {
+    dateList.push({
+      date: moment().add(i, "days").format("DD"), //01
+      day: moment().add(i, "days").format("dd"), //Sa
+      formattedDate: moment().add(i, "days").format("L"), //01/03/2025
+    });
+  }
+  return dateList;
+};

@@ -8,6 +8,7 @@ import Header from "../../components/Header";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../Constants/Colors";
 import EmptyState from "../../components/EmptyState";
+import MedicatonList from "../../components/MedicatonList";
 const HomeScreen = () => {
   return (
     <View style={{ padding: 25, backgroundColor: "white", height: "100%" }}>
@@ -18,7 +19,8 @@ const HomeScreen = () => {
         size={25}
         color={Colors.DARK_GRAY}
       />
-      <EmptyState />
+      
+      <MedicatonList/>
     </View>
   );
 };
